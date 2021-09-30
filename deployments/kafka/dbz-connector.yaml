@@ -33,8 +33,6 @@ spec:
     value.converter.schemas.enable: false
     value.converter.delegate.converter.type: org.apache.kafka.connect.json.JsonConverter
     value.converter.delegate.converter.type.schemas.enable: false
-    key.converter.schemas.enable: false
-    key.converter.delegate.converter.type.schemas.enable: false
     database.history.kafka.bootstrap.servers: my-cluster-kafka-bootstrap:9092
     database.history.kafka.topic: schema-changes.outbox
     poll.interval.ms: 100
