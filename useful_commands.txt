@@ -1,0 +1,43 @@
+# Start Minikube with Virtualbox driver 
+minikube start --vm-driver virtualbox --cpus 4 --memory 10240 --alsologtostderr --disk-size 40GB
+
+# Apply resource file
+kubectl apply -f kafka-ephemeral.yaml -n kafka
+
+# Run a Kafka producer with interactive shell inside Kubernetes
+kubectl run kafka-producer -ti --image=quay.io/strimzi/kafka:0.25.0-kafka-2.8.0 --rm=true --restart=Never -- bin/kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap.kafka:9092 --topic my-topic
+
+# Run a Kafka consumer inside Kubernetes
+kubectl run kafka-consumer -ti --image=quay.io/strimzi/kafka:0.25.0-kafka-2.8.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap.kafka:9092 --topic outbox.event.order --from-beginning
+
+# Show Kafka topics
+kubectl run kafka-topics -ti --image=quay.io/strimzi/kafka:0.25.0-kafka-2.8.0 --rm=true --restart=Never -- bin/kafka-topics.sh --bootstrap-server my-cluster-kafka-bootstrap.kafka:9092 --list
+
+# Restart a Kafka Connector
+kubectl annotate KafkaConnector dbz-oracle-outbox-connector strimzi.io/restart=true
+
+# Show logs of a pod
+kubectl logs -f odb19c-deployment-988b478f7-6tltb -n oracle
+
+# Execute bash shell of a pod
+kubectl exec -it odb19c-deployment-988b478f7-6tltb -n oracle
+
+# Calculate SHA512 checksum in Windows Powershell
+Get-FileHash ojdbc11-21.3.0.0.jar -Algorithm SHA512 | Format-List
+
+# Create a docker registery credentials secret in Kafka namespace
+kubectl create secret docker-registry dockercred --docker-server=https://index.docker.io/v1/ --docker-username=username --docker-password=password --docker-email=your.email@gmail.com -n kafka
+
+# Login to Oracle container registry and pull the latest Oracle enterprise database
+docker login container-registry.oracle.com
+docker pull container-registry.oracle.com/database/enterprise:latest
+
+# Connect to Oracle using SQL*PLUS
+.\sqlplus sys/top_secret@//192.168.99.108:31521/ORCLCDB as sysdba
+.\sqlplus sys/top_secret@//192.168.99.108:31521/ORCLPDB1 as sysdba
+.\sqlplus c##dbzuser/dbz@//192.168.99.108:1521/ORCLPDB1
+
+# Create a new user in Oracle database in the current container
+CREATE USER "DELIVERY" IDENTIFIED BY "dbz" CONTAINER=CURRENT;
+GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE TO "DELIVERY" CONTAINER=CURRENT;
+ALTER USER "DELIVERY" QUOTA UNLIMITED on users CONTAINER=CURRENT;

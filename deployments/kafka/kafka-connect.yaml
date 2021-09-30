@@ -1,0 +1,32 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: my-dbz-connect-cluster
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  version: 2.8.0
+  replicas: 1
+  bootstrapServers: my-cluster-kafka-bootstrap:9092
+  config:
+    group.id: dbz-connector-cluster
+    offset.storage.topic: dbz-connector-cluster-offsets
+    config.storage.topic: dbz-connector-cluster-configs
+    status.storage.topic: dbz-connector-cluster-status
+    config.storage.replication.factor: 1
+    offset.storage.replication.factor: 1
+    status.storage.replication.factor: 1
+  build:
+    output:
+      type: docker
+      image: docker.io/nrsina/strimzi-dbz-oracle-connector:1.7.0.CR2
+      pushSecret: dockercred
+    plugins:
+      - name: debezium-oracle-connector
+        artifacts:
+          - type: tgz
+            url: https://repo1.maven.org/maven2/io/debezium/debezium-connector-oracle/1.7.0.CR2/debezium-connector-oracle-1.7.0.CR2-plugin.tar.gz
+            sha512sum: 608F919B955EEA292F2FE9284DF678F55D21CC9735875227F8D29138C39DD272C4274E8557D2CFABAEAEED6291ADC4D63833CD1989B116ACB5222EBE59E50B73
+          - type: jar
+            url: https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc11/21.3.0.0/ojdbc11-21.3.0.0.jar
+            sha512sum: B1F665D5203090A92AF98BD674ABB69C0BADD9114244421E57160969307C0F9350C28ED7B951DBA7EA310E9F733701F21DBA1E4CE6ABD721F09C15B4EE5B7798

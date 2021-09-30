@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.snourian.outbox
+testFramework: junit
+sourceLanguage: java
+buildTool: gradle
+features: [annotation-api, app-name, data, data-jpa, gradle, hibernate-jpa, http-client, java, java-application, jdbc-hikari, jib, junit, kafka, logback, netty-server, oracle, readme, shade, testcontainers, yaml]

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery-deployment
+  namespace: microservices
+  labels:
+    app: delivery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: delivery
+  template:
+    metadata:
+      labels:
+        app: delivery
+    spec:
+      containers:
+      - name: delivery-management
+        image: nrsina/outbox-app-delivery:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8082
+        env:
+        - name: ORACLE_DATASOURCE_URL
+          value: "jdbc:oracle:thin:@odb19c-cip-svc.oracle.svc.cluster.local:1521/ORCLPDB1"
+        - name: DATASOURCE_USERNAME
+          value: "delivery"
+        - name: DATASOURCE_PASSWORD
+          value: "dbz"
+        - name: HIBERNATE_AUTO_DDL
+          value: "update"
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092"

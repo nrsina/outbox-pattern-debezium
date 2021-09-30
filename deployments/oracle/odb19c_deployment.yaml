@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: odb19c-deployment
+  namespace: oracle
+  labels:
+    app: oracle19c
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oracle19c
+  template:
+    metadata:
+      labels:
+        app: oracle19c
+    spec:
+      containers:
+      - name: odb19c
+        image: container-registry.oracle.com/database/enterprise:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: sqlnet
+          containerPort: 1521
+          protocol: TCP
+        env:
+        - name: ORACLE_SID
+          value: "ORCLCDB"
+        - name: ORACLE_PDB
+          value: "ORCLPDB1"
+        - name: ORACLE_PWD
+          value: "top_secret"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: odb19c-cip-svc
+  namespace: oracle
+spec:
+  type: ClusterIP
+  selector:
+    app: oracle19c
+  ports:
+    - name: sqlnet
+      port: 1521
+      targetPort: 1521
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: odb19c-np-svc
+  namespace: oracle
+spec:
+  type: NodePort
+  selector:
+    app: oracle19c
+  ports:
+    - name: sqlnet
+      port: 1521
+      targetPort: 1521
+      nodePort: 31521
+      protocol: TCP

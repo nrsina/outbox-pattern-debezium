@@ -1,0 +1,40 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: dbz-oracle-outbox-connector
+  labels:
+    strimzi.io/cluster: my-dbz-connect-cluster
+spec:
+  class: io.debezium.connector.oracle.OracleConnector
+  tasksMax: 1
+  config:
+    database.hostname: odb19c-cip-svc.oracle.svc.cluster.local
+    database.port: 1521
+    database.user: C##DBZUSER
+    database.password: dbz
+    database.dbname: ORCLCDB
+    database.pdb.name: ORCLPDB1
+    database.server.name: server1
+    database.connection.adapter: logminer
+    schema.include.list: C##DBZUSER
+    table.include.list: C##DBZUSER.OUTBOX
+    tombstones.on.delete: false
+    lob.enabled: true
+    transforms: outbox
+    transforms.outbox.type: io.debezium.transforms.outbox.EventRouter
+    transforms.outbox.table.fields.additional.placement: TYPE:header:eventType
+    transforms.outbox.table.field.event.id: ID
+    transforms.outbox.table.field.event.key: AGGREGATE_ID
+    transforms.outbox.table.field.event.payload: PAYLOAD
+    transforms.outbox.table.field.event.timestamp: TIMESTAMP
+    transforms.outbox.table.field.event.payload.id: AGGREGATE_ID
+    transforms.outbox.route.by.field: AGGREGATE_TYPE
+    value.converter: io.debezium.converters.ByteBufferConverter
+    value.converter.schemas.enable: false
+    value.converter.delegate.converter.type: org.apache.kafka.connect.json.JsonConverter
+    value.converter.delegate.converter.type.schemas.enable: false
+    key.converter.schemas.enable: false
+    key.converter.delegate.converter.type.schemas.enable: false
+    database.history.kafka.bootstrap.servers: my-cluster-kafka-bootstrap:9092
+    database.history.kafka.topic: schema-changes.outbox
+    poll.interval.ms: 100

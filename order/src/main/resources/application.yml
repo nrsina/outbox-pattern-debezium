@@ -1,0 +1,32 @@
+micronaut:
+  application:
+    name: order
+  server:
+    port: 8081
+
+datasources:
+  default:
+    url: ${ORACLE_DATASOURCE_URL:jdbc:oracle:thin:@192.168.99.108:31521/ORCLPDB1}
+    driverClassName: oracle.jdbc.OracleDriver
+    username: ${DATASOURCE_USERNAME:c##dbzuser}
+    password: ${DATASOURCE_PASSWORD:dbz}
+    dialect: ORACLE
+    connection-test-query: select 1 from dual
+
+jpa:
+  default:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: ${HIBERNATE_AUTO_DDL:update}
+        show_sql: ${HIBERNATE_SHOW_SQL:true}
+    entity-scan:
+      packages:
+        - 'com.snourian.outbox.order.domain'
+        - 'com.snourian.outbox.order.outbox.model'
+      classpath: false
+    compile-time-hibernate-proxies: true
+
+kafka:
+  bootstrap:
+    servers: ${KAFKA_BOOTSTRAP_SERVERS:192.168.99.108:30621}
